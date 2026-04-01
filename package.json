@@ -1,5 +1,5 @@
 {
-  "name": "cloud-machine",
+  "name": "cloud-engine",
   "version": "1.0.0",
   "description": "Discord file transfer bot with web interface",
   "main": "dist/index.js",

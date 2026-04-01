@@ -1,4 +1,4 @@
-# Cloud Machine - Project Specification
+# Cloud Engine - Project Specification
 
 ## Overview
 A Discord bot with web interface for uploading/downloading files through Discord, bypassing the 25MB attachment limit by splitting files into chunks.

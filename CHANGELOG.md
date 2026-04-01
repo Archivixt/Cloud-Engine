@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Cloud Machine project.
+All notable changes to Cloud Engine project.
 
 ## [1.0.0] - 2026-04-01
 
