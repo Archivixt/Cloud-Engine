@@ -1,0 +1,19 @@
+{
+  "discord": {
+    "token": "YOUR_DISCORD_BOT_TOKEN",
+    "channelId": "DISCORD_CHANNEL_ID"
+  },
+  "server": {
+    "port": 3000,
+    "host": "localhost"
+  },
+  "upload": {
+    "chunkSizeMB": 24,
+    "maxFileSizeMB": 500
+  },
+  "paths": {
+    "chunksDir": "./uploads/chunks",
+    "tempDir": "./uploads/temp",
+    "database": "./data/cloudmachine.db"
+  }
+}

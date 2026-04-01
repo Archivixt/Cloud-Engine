@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Machine</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Cloud Machine</h1>
+      <p class="subtitle">Upload & download files through Discord</p>
+      <div class="status-bar" id="statusBar">
+        <span class="status-indicator" id="statusIndicator"></span>
+        <span id="statusText">Checking...</span>
+      </div>
+    </header>
+
+    <main>
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('upload')">Upload</button>
+        <button class="nav-tab" onclick="switchTab('files')">My Files</button>
+        <button class="nav-tab" onclick="switchTab('history')">Download History</button>
+      </div>
+
+      <div id="upload-tab" class="tab-content active">
+        <div class="card">
+          <div class="drop-zone" id="dropZone">
+            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p class="drop-text">Drop your file here</p>
+            <p class="drop-subtext">or</p>
+            <label class="file-btn">
+              Browse Files
+              <input type="file" id="fileInput" hidden>
+            </label>
+            <p class="file-limit">Max 500MB, auto-split into Discord-safe chunks</p>
+          </div>
+
+          <div class="progress-container" id="uploadProgress" hidden>
+            <div class="progress-info">
+              <span id="progressFileName"></span>
+              <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-detail" id="progressDetail">Uploading...</p>
+          </div>
+        </div>
+
+        <div class="card success-card" id="uploadResult" hidden>
+          <h3>Upload Complete!</h3>
+          <div class="result-box">
+            <div class="result-row">
+              <span class="result-label">File ID</span>
+              <span class="result-value"><code id="resultFileId"></code></span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Name</span>
+              <span class="result-value" id="resultFileName"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Size</span>
+              <span class="result-value" id="resultFileSize"></span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Chunks</span>
+              <span class="result-value"><span id="resultChunkCount"></span> <span class="badge badge-chunk">stored in Discord</span></span>
+            </div>
+          </div>
+          <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Save your File ID to download later</p>
+          <div style="display: flex; gap: 0.5rem; justify-content: center;">
+            <button class="btn btn-secondary" onclick="copyFileId()">Copy ID</button>
+            <button class="btn btn-secondary" onclick="goToDownload()">Download Now</button>
+            <button class="btn btn-primary" onclick="resetUpload()">Upload Another</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="files-tab" class="tab-content">
+        <div class="card">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+              <polyline points="13 2 13 9 20 9"></polyline>
+            </svg>
+            Uploaded Files
+          </div>
+          <div class="files-list" id="filesList">
+            <p class="loading">Loading...</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="history-tab" class="tab-content">
+        <div class="card">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Download History
+          </div>
+          <div class="files-list" id="downloadHistory">
+            <p class="empty-state" id="emptyHistory">No downloads yet</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/app.js"></script>
+</body>
+</html>

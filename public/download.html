@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud Machine - Download</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a href="/" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Back to Cloud Machine
+      </a>
+      <h1>Download File</h1>
+      <p class="subtitle">Reassemble your file from Discord</p>
+    </header>
+
+    <main>
+      <div class="card" id="lookupCard">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          Enter File ID
+        </div>
+        <div class="input-group" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <input type="text" id="fileIdInput" placeholder="Paste file ID here..." 
+                 style="flex: 1; padding: 0.8rem 1rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 1rem;">
+          <button class="btn btn-primary" onclick="lookupFile()" style="padding: 0.8rem 1.5rem;">Look Up</button>
+        </div>
+      </div>
+
+      <div class="card" id="fileInfoCard" hidden>
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+            <polyline points="13 2 13 9 20 9"></polyline>
+          </svg>
+          File Information
+        </div>
+        <div class="result-box">
+          <div class="result-row">
+            <span class="result-label">File Name</span>
+            <span class="result-value" id="infoFileName"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Size</span>
+            <span class="result-value" id="infoFileSize"></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Chunks</span>
+            <span class="result-value"><span id="infoChunks"></span> <span class="badge badge-chunk">stored in Discord</span></span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Uploaded</span>
+            <span class="result-value" id="infoUploaded"></span>
+          </div>
+        </div>
+        <button class="btn download-btn" onclick="downloadFile()" style="width: 100%; padding: 1rem; font-size: 1rem; justify-content: center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Download as ZIP
+        </button>
+      </div>
+
+      <div class="card" id="downloadProgress" hidden>
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          Downloading
+        </div>
+        <div class="progress-bar" style="margin: 1rem 0;">
+          <div class="progress-fill" id="downloadProgressFill" style="width: 0%;"></div>
+        </div>
+        <p class="progress-detail" id="downloadProgressDetail">Fetching chunks from Discord...</p>
+      </div>
+
+      <div class="card" id="errorCard" hidden>
+        <div style="text-align: center; padding: 2rem;">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" style="margin-bottom: 1rem;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          <h3 style="color: var(--error); margin-bottom: 0.5rem;">Error</h3>
+          <p id="errorMessage" style="color: var(--text-secondary); margin-bottom: 1.5rem;"></p>
+          <button class="btn btn-secondary" onclick="resetDownload()">Try Again</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script>
+    let currentFileId = null;
+
+    const fileIdFromUrl = window.location.pathname.split('/').pop();
+    if (fileIdFromUrl && fileIdFromUrl !== 'download') {
+      document.getElementById('fileIdInput').value = fileIdFromUrl;
+      lookupFile();
+    }
+
+    document.getElementById('fileIdInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') lookupFile();
+    });
+
+    async function lookupFile() {
+      const fileId = document.getElementById('fileIdInput').value.trim();
+      if (!fileId) return;
+
+      try {
+        const response = await fetch(`/api/files/${fileId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          currentFileId = fileId;
+          document.getElementById('lookupCard').hidden = true;
+          document.getElementById('fileInfoCard').hidden = false;
+          document.getElementById('errorCard').hidden = true;
+
+          document.getElementById('infoFileName').textContent = data.originalName;
+          document.getElementById('infoFileSize').textContent = formatBytes(data.totalSize);
+          document.getElementById('infoChunks').textContent = data.chunkCount;
+          document.getElementById('infoUploaded').textContent = formatDate(data.createdAt);
+        } else {
+          showError(data.error || 'File not found');
+        }
+      } catch (error) {
+        showError('Failed to look up file');
+      }
+    }
+
+    async function downloadFile() {
+      if (!currentFileId) return;
+
+      document.getElementById('fileInfoCard').hidden = true;
+      document.getElementById('downloadProgress').hidden = true;
+      document.getElementById('downloadProgress').hidden = false;
+      
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress = Math.min(progress + Math.random() * 15, 90);
+        document.getElementById('downloadProgressFill').style.width = progress + '%';
+      }, 500);
+
+      try {
+        const prepareResponse = await fetch(`/api/files/${currentFileId}/download`);
+        const prepareData = await prepareResponse.json();
+
+        clearInterval(interval);
+        document.getElementById('downloadProgressFill').style.width = '100%';
+
+        if (prepareData.success) {
+          setTimeout(() => {
+            window.location.href = `/api/files/${currentFileId}/download/zip`;
+          }, 300);
+        } else {
+          document.getElementById('downloadProgress').hidden = true;
+          showError(prepareData.error || 'Download failed');
+        }
+      } catch (error) {
+        clearInterval(interval);
+        document.getElementById('downloadProgress').hidden = true;
+        showError('Download failed');
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('lookupCard').hidden = true;
+      document.getElementById('fileInfoCard').hidden = true;
+      document.getElementById('errorCard').hidden = false;
+      document.getElementById('errorMessage').textContent = message;
+    }
+
+    function resetDownload() {
+      document.getElementById('lookupCard').hidden = false;
+      document.getElementById('fileInfoCard').hidden = true;
+      document.getElementById('errorCard').hidden = true;
+      document.getElementById('downloadProgress').hidden = true;
+      document.getElementById('fileIdInput').value = '';
+      currentFileId = null;
+    }
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    function formatDate(isoString) {
+      return new Date(isoString).toLocaleString();
+    }
+  </script>
+</body>
+</html>

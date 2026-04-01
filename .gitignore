@@ -1,0 +1,15 @@
+node_modules
+dist
+npm-debug.log
+.env
+.env.*
+!.env.example
+uploads/chunks/*
+uploads/temp/*
+data/*
+!data/.gitkeep
+*.db
+*.db-shm
+*.db-wal
+logs/*.log
+*.log
