@@ -16,7 +16,7 @@ A Discord bot with a web interface for uploading and downloading files through D
 
 ## Screenshots
 
-The UI features a cozy, Vencord-inspired design with:
+The UI features a cozy design with:
 - Soft purple accent colors
 - Glassmorphism cards with blur effects
 - Smooth animations
