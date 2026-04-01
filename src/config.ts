@@ -3,7 +3,7 @@ import * as path from 'path';
 
 export interface DiscordConfig {
   token: string;
-  channelId: string;
+  storageChannelId: string;
 }
 
 export interface ServerConfig {

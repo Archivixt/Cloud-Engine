@@ -38,7 +38,7 @@ export function isBotReady(): boolean {
 }
 
 async function uploadFile(buffer: Buffer, filename: string): Promise<{ messageId: string; attachmentId: string }> {
-  const channel = await client.channels.fetch(config.discord.channelId);
+  const channel = await client.channels.fetch(config.discord.storageChannelId);
   if (!channel || !(channel instanceof TextChannel)) {
     throw new Error('Invalid channel configuration');
   }
@@ -54,7 +54,7 @@ async function uploadFile(buffer: Buffer, filename: string): Promise<{ messageId
 }
 
 async function createFileThread(threadName: string, fileInfo: any): Promise<string> {
-  const channel = await client.channels.fetch(config.discord.channelId);
+  const channel = await client.channels.fetch(config.discord.storageChannelId);
   if (!channel || !(channel instanceof TextChannel)) {
     throw new Error('Invalid channel configuration');
   }
@@ -70,7 +70,7 @@ async function createFileThread(threadName: string, fileInfo: any): Promise<stri
 }
 
 async function downloadAttachment(messageId: string, attachmentId: string): Promise<Buffer> {
-  const channel = await client.channels.fetch(config.discord.channelId);
+  const channel = await client.channels.fetch(config.discord.storageChannelId);
   if (!channel || !(channel instanceof TextChannel)) {
     throw new Error('Invalid channel configuration');
   }
@@ -149,7 +149,7 @@ client.once('ready', async () => {
     connected: true,
     ready: true,
     guilds: client.guilds.cache.size,
-    channel: config.discord.channelId
+    channel: config.discord.storageChannelId
   };
   await registerSlashCommands();
 });

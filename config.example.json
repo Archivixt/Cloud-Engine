@@ -1,7 +1,7 @@
 {
   "discord": {
     "token": "YOUR_DISCORD_BOT_TOKEN",
-    "channelId": "DISCORD_CHANNEL_ID"
+    "storageChannelId": "DISCORD_CHANNEL_ID"
   },
   "server": {
     "port": 3000,
